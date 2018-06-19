@@ -1,38 +1,45 @@
 
+/** CUSTOMERS DIMENSION **/
 CREATE TABLE DIM_CUSTOMERS (
-	ID_CUSTOMER INT(6),
+	ID_CUSTOMER VARCHAR(5),
 	NAME VARCHAR(50),
 	COUNTRY VARCHAR(50),
 	CITY VARCHAR(50)
 )
-
+/* LOAD */
 INSERT INTO DIM_CUSTOMERS(ID_CUSTOMER, NAME, COUNTRY, CITY)
-SELECT C.id, C.first_name, C.country_region, C.city FROM customers C
-SELECT * from sad.DIM_CUSTOMERS
+SELECT C.CustomerID, C.ContactName, C.Country, C.City FROM customers C
+/* SELECT */
+SELECT * from DIM_CUSTOMERS
 
 
+/** PRODUCTS DIMENSION **/
 CREATE TABLE DIM_PRODUCTS (
-	ID_PRODUCT INT(6),
+	ID_PRODUCT INT(11),
 	NAME VARCHAR(50),
-	SKU VARCHAR(50),
 	CATEGORY VARCHAR(50)
 )
-
-INSERT INTO DIM_PRODUCTS(ID_PRODUCT, NAME, SKU, CATEGORY)
-SELECT P.id, P.product_name, P.product_code, P.category FROM products P
+/* LOAD */
+INSERT INTO DIM_PRODUCTS(ID_PRODUCT, NAME, CATEGORY)
+SELECT P.ProductID, P.ProductName, C.CategoryName
+FROM products P
+INNER JOIN categories C ON P.CategoryID = C.CategoryID
+/* SELECT */
 SELECT * FROM DIM_PRODUCTS
 
+/** TIME DIMENSION **/
 CREATE TABLE DIM_TIME(
 	YEAR INT(4),
 	MONTH VARCHAR(30),
 	DAY INT(2)
 )
-
+/* LOAD */
 INSERT INTO DIM_TIME (YEAR, MONTH, DAY)
-SELECT YEAR(O.order_date), MONTHNAME(O.order_date), DAY(O.order_date) FROM orders O
+SELECT YEAR(O.OrderDate), MONTHNAME(O.OrderDate), DAY(O.OrderDate) FROM orders O
+/* SELECT */ 
 SELECT * FROM DIM_TIME
 
-
+/** ORDERS MEASURE **/
 CREATE TABLE MEA_ORDERS (
 	CUSTOMER_NAME VARCHAR(50),
 	PRODUCT_NAME VARCHAR(50),
@@ -43,8 +50,12 @@ CREATE TABLE MEA_ORDERS (
 	DAY INT(2)
 )
 
+/* LOAD */
 INSERT INTO MEA_ORDERS(CUSTOMER_NAME, PRODUCT_NAME, PRODUCT_CATEGORY, PRODUCT_UNIT_PRICE, YEAR, MONTH, DAY)
-SELECT C.first_name , P.product_name, P.category, OD.unit_price, YEAR(O.order_date), MONTHNAME(O.order_date), DAY(O.order_date) FROM orders O
-INNER JOIN order_details OD ON O.id = OD.order_id
-INNER JOIN products P ON OD.product_id = P.id
-INNER JOIN customers C ON O.customer_id = C.id
+SELECT C.ContactName , P.ProductName, CT.CategoryName, OD.UnitPrice , YEAR(O.OrderDate), MONTHNAME(O.OrderDate), DAY(O.OrderDate) FROM orders O
+INNER JOIN `order details` OD ON O.OrderId = OD.OrderId
+INNER JOIN products P ON OD.ProductId = P.ProductID
+INNER JOIN categories CT ON P.CategoryID = CT.CategoryID
+INNER JOIN customers C ON O.CustomerID = C.CustomerID
+/*SELECT */
+SELECT * FROM MEA_ORDERS
