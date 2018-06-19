@@ -1,0 +1,42 @@
+<?xml version='1.0'?>
+<Schema name="Global Schema" metamodelVersion='4.0'>
+	<PhysicalSchema>
+		<Table name='pedido'>
+			<Key>
+				<Column name='cd_pedido'/>
+			</Key>
+		</Table>
+		<Table name='cliente'>
+			<Key>
+				<Column name='ds_cliente_fantasia'/>
+			</Key>
+		</Table>
+		<Link source='pedido' target='cliente'>
+				<ForeignKey>
+						<Column name='cd_cliente'/>
+				</ForeignKey>
+		</Link>
+	</PhysicalSchema>
+
+	<Cube name="Vendas" visible="true" cache="true" enabled="true">
+		<Dimensions>
+			<Dimension name='Cliente' table='cliente' key="ID">
+				<Attributes>
+					<Attribute name='Nome' keyColumn='ds_cliente_fantasia' hasHierarchy='true'/>
+					<Attribute name="ID" keyColumn='cd_cliente' hasHierarchy='false'/>
+				</Attributes>
+			</Dimension>
+		</Dimensions>
+
+		<MeasureGroups>
+				<MeasureGroup name='Media' table='pedido'>
+				<Measures>
+					<Measure name='Vendas por Cliente' column='vl_pedido_fechacambio' aggregator='avg' formatString='#,###.00'/>
+				</Measures>
+				<DimensionLinks>
+					<ForeignKeyLink foreignKeyColumn='cd_cliente' dimension='Cliente'/>
+				</DimensionLinks>
+			</MeasureGroup>
+		</MeasureGroups>
+		</Cube>
+</Schema>
